@@ -1,0 +1,29 @@
+---
+# Tasks (usually) only run once per instance
+
+- name: Django collectstatic
+  django_manage:
+    command: collectstatic
+    app_path: "{{ django_path }}"
+    virtualenv: "{{ django_project_path }}"
+  environment: "{{ django_settings }}"
+  run_once: '{{ django_collectstatic_once }}'
+  tags: [django_collectstatic]
+
+- name: Django migrate
+  django_manage:
+    command: migrate
+    app_path: "{{ django_path }}"
+    virtualenv: "{{ django_project_path }}"
+  environment: "{{ django_settings }}"
+  run_once: yes
+  tags: [django_migrate]
+
+- name: Set default site
+  django_manage:
+    command: 'set_default_site --name "{{ django_hostname }}" --domain {{ django_hostname }}'
+    app_path: "{{ django_path }}"
+    virtualenv: "{{ django_project_path }}"
+  environment: "{{ django_settings }}"
+  run_once: yes
+  tags: [django_default_site]

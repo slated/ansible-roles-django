@@ -1,0 +1,19 @@
+---
+# tasks file for django beatapp deploy
+
+- name: Celerybeat conf
+  become: yes
+  template:
+    src: celerybeat-supervisor.conf.j2
+    dest: '/etc/supervisor/conf.d/{{ django_project_name }}_celerybeat.conf'
+    owner: root
+    group: root
+  register: celerybeat_conf
+  notify: Restart celerybeat
+
+- name: Celerybeat conf present
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celerybeat'
+    state: present
+  when: celerybeat_conf.changed

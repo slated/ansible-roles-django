@@ -1,0 +1,6 @@
+---
+# tasks file for django
+
+- name: Django environment settings
+  set_fact:
+    django_settings: "{{ django_base_settings | combine(django_extra_settings, recursive=True) }}"

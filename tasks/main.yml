@@ -1,0 +1,47 @@
+---
+# tasks file for django
+
+- debug:
+    var: django_webapp
+    verbosity: 1
+    tags: [always]
+
+- debug:
+    var: django_taskapp
+    verbosity: 1
+    tags: [always]
+    
+- debug:
+    var: django_beatapp
+    verbosity: 1
+    tags: [always]
+    
+- import_tasks: django_settings.yml
+  tags: [always]
+
+- import_tasks: create_database.yml
+  tags: [django, build, create_database]
+  run_once: yes
+  
+- import_tasks: build.yml
+  tags: [django, build]
+
+- import_tasks: deploy_all.yml
+  tags: [django, deploy]
+  when: django_webapp or django_taskapp or django_beatapp
+
+- import_tasks: deploy_once.yml
+  tags: [django, deploy]
+  when: django_webapp
+
+- import_tasks: deploy_webapp.yml
+  tags: [django, deploy, webapp]
+  when: django_webapp
+
+- import_tasks: deploy_taskapp.yml
+  tags: [django, deploy, taskapp]
+  when: django_taskapp
+
+- import_tasks: deploy_beatapp.yml
+  tags: [django, deploy, beatapp]
+  when: django_beatapp

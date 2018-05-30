@@ -1,0 +1,23 @@
+---
+# handlers file for django
+
+- name: Start supervisor
+  become: yes
+  service:
+    name: supervisor
+    state: started
+
+- name: Reload uwsgi
+  shell: "kill `cat {{ django_run_path }}/uwsgi.pid`"
+  
+- name: Restart celery
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celery:' # note : for numprocs option
+    state: restarted
+  
+- name: Restart celerybeat
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celerybeat'
+    state: restarted

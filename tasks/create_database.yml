@@ -1,0 +1,35 @@
+---
+# tasks file for django database
+
+- name: Create db user
+  postgresql_user:
+    name: '{{ django_db_user }}'
+    password: '{{ django_db_password }}'
+    role_attr_flags: CREATEDB
+    login_user: '{{ django_db_superuser }}'
+    login_password: '{{ django_db_superpassword }}'
+    login_host: '{{ django_db_host }}'
+    db: postgres
+
+- name: Create db
+  postgresql_db:
+    name: '{{ django_db_name }}'
+    login_user: '{{ django_db_user }}'
+    login_password: '{{ django_db_password }}'
+    login_host: '{{ django_db_host }}'
+    owner: '{{ django_db_user }}'
+    encoding: UTF-8
+    lc_collate: '{{ django_db_locale }}'
+    lc_ctype:  '{{ django_db_locale }}'
+    template: template0
+
+- name: Create Postgres database extensions
+  postgresql_ext:
+    db: '{{ django_db_name }}'
+    login_user: '{{ django_db_superuser }}'
+    login_password: '{{ django_db_superpassword }}'
+    login_host: '{{ django_db_host }}'
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ django_postgresql_extensions }}'
+  

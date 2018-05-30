@@ -1,0 +1,23 @@
+[uwsgi]
+chdir = {{ django_path }}
+module = config.wsgi:application
+virtualenv = {{ django_project_path }}
+master = True
+pidfile = {{ django_run_path }}/uwsgi.pid
+logto = {{ django_log_path }}/uwsgi.log
+socket = {{ django_wsgi_addr }}:{{ django_wsgi_port }}
+protocol = uwsgi
+vacuum = True
+processes = {{ django_processes|default(ansible_processor_cores) }}
+harakiri = {{ django_uwsgi_harakiri|default(60) }}
+enable-threads = True
+single-interpreter = True
+limit-as = 1280
+reload-on-as = 1024
+# set lazy-apps, see following refs:
+# http://uwsgi-docs.readthedocs.io/en/latest/articles/TheArtOfGracefulReloading.html#preforking-vs-lazy-apps-vs-lazy
+# https://stackoverflow.com/questions/22752521/uwsgi-flask-sqlalchemy-and-postgres-ssl-error-decryption-failed-or-bad-reco
+lazy-apps = true
+{% for variable_name, value in django_settings.items()|sort %}
+env = {{ variable_name }}={{ value }}
+{% endfor %}

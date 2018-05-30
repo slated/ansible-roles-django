@@ -1,0 +1,57 @@
+---
+# tasks file for all flavors of django deploy
+
+- name: Virtualenv postactivate
+  template:
+    src: virtualenv_postactivate.j2
+    dest: '{{ django_project_path }}/bin/postactivate'
+    mode: 0640
+    backup: yes
+
+- name: Pull from repo
+  hg:
+    repo: '{{ django_repo_url }}'
+    dest: '{{ django_repo_path }}'
+    version: '{{ django_repo_version }}'
+    force: yes
+  register: repo_pull
+  
+- name: Repo changed
+  set_fact:
+    repo_changed: '{{ repo_pull.changed or (repo_changed is defined and repo_changed) }}'
+
+- name: Repo changed?
+  debug:
+    var: repo_changed
+    verbosity: 1
+
+# These "debug notify" tricks are needed to handle a changed repo in
+# the first pass, django_webapp true, yet still triggering the correct
+# handler in the subsequent pass where repo_pull.changed may not be
+# true (esp for single server configs)
+
+- name: Reload uwsgi notify
+  debug:
+    var: repo_changed
+  when: django_webapp
+  changed_when: repo_changed and django_webapp
+  notify: Reload uwsgi
+
+- name: Restart celery notify
+  debug:
+    var: repo_changed
+  when: django_taskapp
+  changed_when: repo_changed and django_taskapp
+  notify: Restart celery
+    
+- name: Restart celerybeat notify
+  debug:
+    var: repo_changed
+  when: django_beatapp
+  changed_when: repo_changed and django_beatapp
+  notify: Restart celerybeat
+    
+- name: Pip install
+  pip:
+    virtualenv: '{{ django_project_path }}'
+    requirements: '{{ django_path }}/requirements/production.txt'

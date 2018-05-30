@@ -1,0 +1,33 @@
+---
+# tasks file for django webapp deploy
+
+- name: Uwsgi conf
+  become: yes
+  template:
+    src: uwsgi-supervisor.conf.j2
+    dest: '/etc/supervisor/conf.d/{{ django_project_name }}_uwsgi.conf'
+    owner: root
+    group: root
+  register: uwsgi_conf
+
+- name: Uwsgi ini
+  template:
+    src: uwsgi.ini.j2
+    dest: '{{ django_path }}/uwsgi.ini'
+  register: uwsgi_ini
+  notify: Reload uwsgi
+
+- name: Uwsgi conf present
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_uwsgi'
+    state: present
+  when: uwsgi_conf.changed
+  register: uwsgi_present
+  
+- name: Uwsgi supervisor updated & restarted
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_uwsgi'
+    state: restarted
+  when: uwsgi_conf.changed and not uwsgi_present.changed

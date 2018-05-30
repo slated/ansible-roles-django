@@ -1,0 +1,13 @@
+[program:{{ django_project_name }}_celery]
+command={{ django_project_path }}/bin/celery worker --app={{ application }}.taskapp.celery:app --hostname=worker%(process_num)1d@%%h --loglevel=INFO -c {{ celery_concurrency }} --pool {{ celery_pool_implementation }} --pidfile="{{ django_run_path }}/worker%(process_num)1d@%%h.pid" --logfile="{{ django_log_path }}/worker-%(process_num)1d-%%I@%%h.log"
+directory={{ django_path }}
+user={{ ansible_user }}
+autostart=true
+autorestart=false
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/{{ django_project_name }}-celery.log
+numprocs={{ celery_numprocs }}
+process_name=%(program_name)s_%(process_num)1d
+{% set comma = joiner() %}
+environment={% for variable_name, value in django_settings.items()|sort %}{{ comma() }}{{ variable_name }}="{{ value|replace('%', '%%') }}"{% endfor %}
+

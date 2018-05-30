@@ -1,0 +1,19 @@
+---
+# tasks file for django taskapp deploy
+
+- name: Celery conf
+  become: yes
+  template:
+    src: celery-supervisor.conf.j2
+    dest: '/etc/supervisor/conf.d/{{ django_project_name }}_celery.conf'
+    owner: root
+    group: root
+  register: celery_conf
+  notify: Restart celery
+
+- name: Celery conf present
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celery:'
+    state: present
+  when: celery_conf.changed

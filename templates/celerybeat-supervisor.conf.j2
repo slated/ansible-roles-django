@@ -1,0 +1,10 @@
+[program:{{ django_project_name }}_celerybeat]
+command={{ django_project_path }}/bin/celery beat --app={{ application }}.taskapp.celery:app --loglevel=INFO --scheduler "{{ celery_beat_schedulers }}" --pidfile="{{ django_run_path }}/celerybeat.pid" --logfile="{{ django_log_path }}/celerybeat.log"
+directory={{ django_path }}
+user={{ ansible_user }}
+autostart=true
+autorestart=false
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/{{ django_project_name }}-celerybeat.log
+{% set comma = joiner() %}
+environment={% for variable_name, value in django_settings.items()|sort %}{{ comma() }}{{ variable_name }}="{{ value|replace('%', '%%') }}"{% endfor %}

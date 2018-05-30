@@ -1,0 +1,106 @@
+---
+# defaults file for django
+
+# Default is build Django, but only deploy uwsgi webapp
+django_webapp: yes
+django_taskapp: no
+django_beatapp: no
+
+# Used as default for virtualenv, local clone, dbuser/name/pass, ...
+# Should be alphanum and _, nothing illegal for dbnames, dirs, ...
+django_project_name: django
+
+# project will clone to {{ django_project_home }}/{{ django_project_name }}
+django_project_home: '{{ ansible_env.HOME }}'
+
+# Source code repo, branch, and dirs
+django_repo_url: ssh://hg@bitbucket.org/myawesomeproject
+django_repo_version: default
+django_local_repo: '{{ django_project_name }}'
+
+# Domain and name (for Django default site, nginx, etc.)
+django_hostname: '{{ hostname }}'
+django_project_description: '{{ description }}'
+
+# Site secret
+django_secret_key: 'changethesecretkeyforeachtarget'
+
+# Must match a Django settings .py in config/settings, e.g., 'dev'
+django_settings_module: 'config.settings.production'
+
+# Pip install requirements
+django_pip_requirements: production.txt
+
+# Database settings.
+django_db_host: localhost
+django_db_user: '{{ django_project_name }}'
+django_db_name:  '{{ django_project_name }}'
+django_db_password:  '{{ django_project_name }}'
+django_db_superuser: postgres
+django_db_superpassword: postgres
+django_db_locale: en_US.UTF-8
+
+# rarely changed settings
+django_upstream_hostkey: bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+django_wsgi_addr: '{{ ansible_lo.ipv4.address }}'
+django_wsgi_port: 10000
+django_uwsgi_processes: '{{ ansible_processor_cores }}'
+django_uwsgi_harakiri: 60
+
+# paths
+
+django_project_path: '{{ django_project_home }}/{{ django_project_name }}' # usually cdvirtualenv
+django_log_path: '{{ django_project_path }}/log'
+django_run_path: '{{ django_project_path }}/run'
+django_media_root: '{{ django_project_path }}/media'
+django_static_root: '{{ django_project_path }}/static'
+django_repo_path: '{{ django_project_path }}/{{ django_project_name }}' # clone to here
+django_project_subdir: . # change if django project is under django_project_path
+django_path: '{{ django_repo_path }}/{{ django_project_subdir }}'
+django_collectstatic_once: no # with whitenoise, must run collectstatic on all webapp instances
+
+# Standard Django environment settings vars
+django_base_settings:
+  DJANGO_SETTINGS_MODULE: '{{ django_settings_module }}'
+  DJANGO_SECRET_KEY: '{{ django_secret_key }}'
+  DATABASE_URL: 'postgres://{{ django_db_user }}:{{ django_db_password }}@{{ django_db_host }}/{{ django_db_name }}'
+
+# Additional Django environment settings vars
+django_extra_settings:
+
+django_base_apt_packages:
+    # Assume already installed for django_python setting
+    # - python-pip
+    # - python3.x
+    # - python3.x-dev
+    - gettext
+    # database
+    - python-psycopg2
+    # shared dependencies of:
+    # Pillow, pylibmc
+    - zlib1g-dev
+    # Postgresql and psycopg2 dependencies (mysql for slated import)
+    - libpq-dev
+    - libmysqlclient-dev
+    # Pillow dependencies
+    - libtiff5-dev
+    - libjpeg8-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
+    # django-extensions
+    - graphviz-dev
+    # for wsgi, celery process management
+    - supervisor
+    # devops convenience
+    - emacs24-nox
+    # until migrated to a separate server
+    - redis-server
+
+django_extra_apt_packages:
+
+# Celery settings
+celery_concurrency: '{{ ansible_processor_cores }}'
+celery_numprocs: 3 #'{{ ansible_processor_cores }}'
+celery_pool_implementation: prefork # prefork (default), eventlet, gevent or solo
+celery_beat_schedulers: django_celery_beat.schedulers:DatabaseScheduler

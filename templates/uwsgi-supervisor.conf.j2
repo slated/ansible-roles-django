@@ -1,0 +1,10 @@
+[program:{{ django_project_name }}_uwsgi]
+command={{django_project_path }}/bin/uwsgi --ini {{ django_path }}/uwsgi.ini
+directory={{ django_path }}
+user={{ ansible_user }}
+environment=
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/{{ django_project_name }}-uwsgi.log
+stopsignal=INT

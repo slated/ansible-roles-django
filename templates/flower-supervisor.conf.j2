@@ -1,0 +1,11 @@
+[program:flower]
+command={{ project_path }}/bin/flower -A {{ application }}.taskapp.celery:app --url_prefix=flower
+directory={{ django_path }}
+user={{ ansible_user }}
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/supervisor-flower.log
+{% set comma = joiner() %}
+environment={% for variable_name, value in django_environment.items()|sort %}{{ comma() }}{{ variable_name }}="{{ value|replace('%', '%%') }}"{% endfor %}
+

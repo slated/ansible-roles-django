@@ -1,0 +1,47 @@
+---
+# tasks file for django build
+
+- name: Install base Django apt packages
+  become: yes
+  apt:
+    update_cache: yes
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ django_base_apt_packages }}'
+  notify:
+    - Start supervisor
+
+- name: Install extra Django apt packages
+  become: yes
+  apt:
+    update_cache: yes
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ django_extra_apt_packages }}'
+
+- name: Add repo hostkey
+  known_hosts:
+    name: bitbucket.org
+    key: '{{ django_upstream_hostkey }}'
+  tags: django_apt_packages
+
+- name: Clone repo
+  hg:
+    repo: '{{ django_repo_url }}'
+    dest: '{{ django_repo_path }}'
+
+- name: Set virtualenv .project 
+  template:
+    src: virtualenv-dot-project.j2
+    dest: '{{ django_project_path }}/.project'
+
+- name: Create Django static_root, media_root, log, run
+  file:
+    path: '{{ item }}'
+    mode: 0775
+    state: directory
+  with_items:
+    - '{{ django_static_root }}'
+    - '{{ django_media_root }}'
+    - '{{ django_log_path }}'
+    - '{{ django_run_path }}'
