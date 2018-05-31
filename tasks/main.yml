@@ -4,17 +4,18 @@
 - debug:
     var: django_webapp
     verbosity: 1
-    tags: [always]
 
 - debug:
     var: django_taskapp
     verbosity: 1
-    tags: [always]
     
 - debug:
     var: django_beatapp
     verbosity: 1
-    tags: [always]
+
+- debug:
+    var: django_monitorapp
+    verbosity: 1
     
 - import_tasks: django_settings.yml
   tags: [always]
@@ -45,3 +46,11 @@
 - import_tasks: deploy_beatapp.yml
   tags: [django, deploy, beatapp]
   when: django_beatapp
+
+- import_tasks: deploy_monitorapp.yml
+  tags: [django, deploy, monitorapp]
+  when: django_monitorapp
+
+- import_tasks: deploy_flowerapp.yml
+  tags: [django, deploy, flowerapp]
+  when: django_flowerapp

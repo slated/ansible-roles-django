@@ -1,0 +1,19 @@
+---
+# tasks file for django celery flower deploy
+
+- name: Celeryflower conf
+  become: yes
+  template:
+    src: celeryflower-supervisor.conf.j2
+    dest: '/etc/supervisor/conf.d/{{ django_project_name }}_celeryflower.conf'
+    owner: root
+    group: root
+  register: celeryflower_conf
+  notify: Restart celeryflower
+
+- name: Celeryflower conf present
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celeryflower'
+    state: present
+  when: celeryflower_conf.changed

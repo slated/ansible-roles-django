@@ -1,5 +1,5 @@
 [program:{{ django_project_name }}_celery]
-command={{ django_project_path }}/bin/celery worker --app={{ application }}.taskapp.celery:app --hostname=worker%(process_num)1d@%%h --loglevel=INFO -c {{ celery_concurrency }} --pool {{ celery_pool_implementation }} --pidfile="{{ django_run_path }}/worker%(process_num)1d@%%h.pid" --logfile="{{ django_log_path }}/worker-%(process_num)1d-%%I@%%h.log"
+command={{ django_project_path }}/bin/celery worker --app={{ celery_application }} --hostname=worker%(process_num)1d@%%h --loglevel=INFO -c {{ celery_concurrency }} --pool {{ celery_pool_implementation }} --pidfile="{{ django_run_path }}/worker%(process_num)1d@%%h.pid" --logfile="{{ django_log_path }}/worker-%(process_num)1d-%%I@%%h.log"
 directory={{ django_path }}
 user={{ ansible_user }}
 autostart=true

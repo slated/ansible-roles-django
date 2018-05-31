@@ -1,0 +1,19 @@
+---
+# tasks file for django celery monitor deploy
+
+- name: Celerymonitor conf
+  become: yes
+  template:
+    src: celerymonitor-supervisor.conf.j2
+    dest: '/etc/supervisor/conf.d/{{ django_project_name }}_celerymonitor.conf'
+    owner: root
+    group: root
+  register: celerymonitor_conf
+  notify: Restart celerymonitor
+
+- name: Celerymonitor conf present
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celerymonitor'
+    state: present
+  when: celerymonitor_conf.changed

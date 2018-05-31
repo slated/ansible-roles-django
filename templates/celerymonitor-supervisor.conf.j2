@@ -1,0 +1,10 @@
+[program:{{ django_project_name }}_celerymonitor]
+command={{ django_project_path }}/bin/celery events --app={{ celery_application }} --camera django_celery_monitor.camera.Camera --frequency=1.0 --loglevel=INFO --pidfile="{{ django_run_path }}/celerymonitor.pid" --logfile="{{ django_log_path }}/celerymonitor.log"
+directory={{ django_path }}
+user={{ ansible_user }}
+autostart=true
+autorestart=false
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/{{ django_project_name }}-celerymonitor.log
+{% set comma = joiner() %}
+environment={% for variable_name, value in django_settings.items()|sort %}{{ comma() }}{{ variable_name }}="{{ value|replace('%', '%%') }}"{% endfor %}

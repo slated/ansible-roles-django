@@ -30,6 +30,7 @@ Source code repo, branch, and dirs
 
     django_repo_url: ssh://hg@bitbucket.org/myawesomeproject
     django_repo_version: default
+    django_repo_type: git
     django_local_repo: '{{ django_project_name }}'
 
 Domain and name (for Django default site, nginx, etc.)
@@ -103,7 +104,7 @@ Normally leave base packages as-is, add with `django_extra_apt_packages`:
         # shared dependencies of:
         # Pillow, pylibmc
         - zlib1g-dev
-        # Postgresql and psycopg2 dependencies (mysql for slated import)
+        # Mysql, Postgresql and psycopg2 dependencies
         - libpq-dev
         - libmysqlclient-dev
         # Pillow dependencies

@@ -21,3 +21,16 @@
   supervisorctl:
     name: '{{ django_project_name }}_celerybeat'
     state: restarted
+
+- name: Restart celerymonitor
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celerymonitor'
+    state: restarted
+
+- name: Restart celeryflower
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_celeryflower'
+    state: restarted
+    

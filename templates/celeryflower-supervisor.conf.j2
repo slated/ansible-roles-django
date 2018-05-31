@@ -1,0 +1,11 @@
+[program:{{ django_project_name }}_celeryflower]
+command={{ django_project_path }}/bin/flower -app={{ celery_application }} --url_prefix={{ flower_url_prefix }} --address={{ flower_address }} --port={{ flower_port }}
+directory={{ django_path }}
+user={{ ansible_user }}
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/{{ django_project_name }}-celeryflower.log
+{% set comma = joiner() %}
+environment={% for variable_name, value in django_settings.items()|sort %}{{ comma() }}{{ variable_name }}="{{ value|replace('%', '%%') }}"{% endfor %}
+
