@@ -16,6 +16,8 @@ Default is build Django, but only deploy uwsgi webapp
     django_webapp: yes
     django_taskapp: no
     django_beatapp: no
+    django_monitorapp: no
+    django_flowerapp: no
 
 Used as default for virtualenv, local clone, dbuser/name/pass, ...
 Should be alphanum and _, nothing illegal for dbnames, dirs, ...
@@ -127,7 +129,7 @@ Normally leave base packages as-is, add with `django_extra_apt_packages`:
 Celery settings
 
     celery_concurrency: '{{ ansible_processor_cores }}'
-    celery_numprocs: 3 #'{{ ansible_processor_cores }}'
+    celery_numprocs: '{{ ansible_processor_cores }}'
     celery_pool_implementation: prefork # prefork (default), eventlet, gevent or solo
     celery_beat_schedulers: django_celery_beat.schedulers:DatabaseScheduler
 
@@ -135,15 +137,15 @@ Celery settings
 Dependencies
 ------------
 
-- rm-software.s-nginx
-- rm-software.s-python
-- rm-software.s-rabbitmq
-- rm-software.s-redis
-- rm-software.s-virtualenv
+- rm-software.nginx
+- rm-software.python
+- rm-software.rabbitmq
+- rm-software.redis
+- rm-software.virtualenv
 
 plus a database server, separately configured or via
 
-- rm-software.s-postgresql
+- rm-software.postgresql
 
 Example Playbook
 ----------------
