@@ -40,11 +40,15 @@
 # handler in the subsequent pass where repo_pull.changed may not be
 # true (esp for single server configs)
 
+- stat: path='{{ django_run_path }}/uwsgi.pid'
+  register: uwsgi_pid_file
+  when: django_webapp
+  
 - name: Reload uwsgi notify
   debug:
     var: repo_changed
   when: django_webapp
-  changed_when: repo_changed and django_webapp
+  changed_when: repo_changed and django_webapp and uwsgi_pid_file.stat.exists
   notify: Reload uwsgi
 
 - name: Restart celery notify

@@ -14,8 +14,8 @@
   template:
     src: uwsgi.ini.j2
     dest: '{{ django_path }}/uwsgi.ini'
-  register: uwsgi_ini
   notify: Reload uwsgi
+  when: uwsgi_pid_file.stat.exists
 
 - name: Uwsgi conf present
   become: yes
@@ -30,4 +30,4 @@
   supervisorctl:
     name: '{{ django_project_name }}_uwsgi'
     state: restarted
-  when: uwsgi_conf.changed and not uwsgi_present.changed
+  when: (uwsgi_conf.changed and not uwsgi_present.changed) or not uwsgi_pid_file.stat.exists
