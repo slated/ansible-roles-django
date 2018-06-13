@@ -14,7 +14,7 @@
     dest: '{{ django_repo_path }}'
     version: '{{ django_repo_version }}'
     force: yes
-  register: repo_pull
+  register: hg_repo_pull
   when: django_repo_type == 'hg'
 
 - name: Pull from git repo
@@ -23,12 +23,12 @@
     dest: '{{ django_repo_path }}'
     version: '{{ django_repo_version }}'
     force: yes
-  register: repo_pull
+  register: git_repo_pull
   when: django_repo_type == 'git'
 
 - name: Repo changed
   set_fact:
-    repo_changed: '{{ repo_pull.changed or (repo_changed is defined and repo_changed) }}'
+    repo_changed: '{{ hg_repo_pull.changed or git_repo_pull.changed or (repo_changed is defined and repo_changed) }}'
 
 - name: Repo changed?
   debug:
