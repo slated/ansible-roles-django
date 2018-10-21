@@ -1,13 +1,6 @@
 ---
 # tasks file for all flavors of django deploy
 
-- name: Virtualenv postactivate
-  template:
-    src: virtualenv_postactivate.j2
-    dest: '{{ django_project_path }}/bin/postactivate'
-    mode: 0640
-    backup: yes
-
 - name: Pull from hg repo
   hg:
     repo: '{{ django_repo_url }}'
@@ -35,6 +28,36 @@
     var: repo_changed
     verbosity: 1
 
+# get repo revision from the pulled code (use output of previous task)
+- name: Set repo_revision variable
+  set_fact:
+    repo_revision: "{{ hg_repo_pull.after.split() | join('-') }}"
+  when: django_repo_type == 'hg'
+
+- name: Set repo_revision variable
+  set_fact:
+    repo_revision: "{{ git_repo_pull.after.split() | join('-') }}"
+  when: django_repo_type == 'git'
+
+- name: Print repository revision
+  debug:
+    var: repo_revision
+
+# add revision to enviroment variables and call it RELEASE_VERSION
+- name: Set repository revision as the RELEASE_VERSION in Django settings
+  set_fact:
+    django_settings: "{{ django_settings | combine({item.key: item.value}) }}"
+  with_items:
+    - { key: 'RELEASE_VERSION', value: "{{repo_revision}}" }
+
+# configure virtualenv
+- name: Virtualenv postactivate
+  template:
+    src: virtualenv_postactivate.j2
+    dest: '{{ django_project_path }}/bin/postactivate'
+    mode: 0640
+    backup: yes
+
 # These "debug notify" tricks are needed to handle a changed repo in
 # the first pass, django_webapp true, yet still triggering the correct
 # handler in the subsequent pass where repo_pull.changed may not be
@@ -43,7 +66,7 @@
 - stat: path='{{ django_run_path }}/uwsgi.pid'
   register: uwsgi_pid_file
   when: django_webapp
-  
+
 - name: Reload uwsgi notify
   debug:
     var: repo_changed
@@ -57,21 +80,21 @@
   when: django_taskapp
   changed_when: repo_changed and django_taskapp
   notify: Restart celery
-    
+
 - name: Restart celerybeat notify
   debug:
     var: repo_changed
   when: django_beatapp
   changed_when: repo_changed and django_beatapp
   notify: Restart celerybeat
-    
+
 - name: Restart celerymonitor notify
   debug:
     var: repo_changed
   when: django_monitorapp
   changed_when: repo_changed and django_monitorapp
   notify: Restart celerymonitor
-    
+
 - name: Pip install
   pip:
     virtualenv: '{{ django_project_path }}'
