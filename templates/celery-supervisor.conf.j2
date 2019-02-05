@@ -1,5 +1,5 @@
 [program:{{ django_project_name }}_celery]
-command={{ django_project_path }}/bin/celery worker --app={{ celery_application }} --hostname=worker%(process_num)1d@%%h --loglevel=INFO -c {{ celery_concurrency }} --pool {{ celery_pool_implementation }} --pidfile="{{ django_run_path }}/worker%(process_num)1d@%%h.pid" --logfile="{{ django_log_path }}/worker-%(process_num)1d-%%I@%%h.log"
+command={{ django_project_path }}/bin/celery worker --app={{ celery_application }} --hostname=worker%(process_num)1d@%%h --loglevel=INFO -c {{ celery_concurrency }} -Q {{celery_queues|default('celery')}} --pool {{ celery_pool_implementation }} --time-limit={{ celery_time_limit }} --pidfile="{{ django_run_path }}/worker%(process_num)1d@%%h.pid" --logfile="{{ django_log_path }}/worker-%(process_num)1d-%%I@%%h.log --soft-time-limit={{ celery_soft_time_limit|default(celery_time_limit)}}"
 directory={{ django_path }}
 user={{ ansible_user }}
 autostart=true
@@ -10,4 +10,3 @@ numprocs={{ celery_numprocs }}
 process_name=%(program_name)s_%(process_num)1d
 {% set comma = joiner() %}
 environment={% for variable_name, value in django_settings.items()|sort %}{{ comma() }}{{ variable_name }}="{{ value|replace('%', '%%') }}"{% endfor %}
-
