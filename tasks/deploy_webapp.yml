@@ -14,7 +14,7 @@
   template:
     src: uwsgi.ini.j2
     dest: '{{ django_path }}/uwsgi.ini'
-  notify: Reload uwsgi
+  notify: Restart uwsgi
   # disabled because it uwsgi fails to start if it can't find the config file
   # when: uwsgi_pid_file.stat.exists
 
@@ -31,4 +31,4 @@
   supervisorctl:
     name: '{{ django_project_name }}_uwsgi'
     state: restarted
-  when: (uwsgi_conf.changed and not uwsgi_present.changed) or not uwsgi_pid_file.stat.exists
+  when: (uwsgi_conf.changed and not uwsgi_present.changed)

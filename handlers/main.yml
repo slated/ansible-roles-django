@@ -7,15 +7,21 @@
     name: supervisor
     state: started
 
-- name: Reload uwsgi
-  shell: "kill `cat {{ django_run_path }}/uwsgi.pid`"
-  
+# - name: Reload uwsgi
+#   shell: "kill `cat {{ django_run_path }}/uwsgi.pid`"
+
+- name: Restart uwsgi
+  become: yes
+  supervisorctl:
+    name: '{{ django_project_name }}_uwsgi'
+    state: restarted
+
 - name: Restart celery
   become: yes
   supervisorctl:
     name: '{{ django_project_name }}_celery:' # note : for numprocs option
     state: restarted
-  
+
 - name: Restart celerybeat
   become: yes
   supervisorctl:
@@ -33,4 +39,3 @@
   supervisorctl:
     name: '{{ django_project_name }}_celeryflower'
     state: restarted
-    

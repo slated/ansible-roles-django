@@ -8,12 +8,23 @@ logto = {{ django_log_path }}/uwsgi.log
 socket = {{ django_wsgi_addr }}:{{ django_wsgi_port }}
 protocol = uwsgi
 vacuum = True
-processes = {{ django_processes|default(ansible_processor_cores) }}
+processes = {{ django_processes|default(ansible_processor_vcpus) }}
 harakiri = {{ django_uwsgi_harakiri|default(60) }}
 enable-threads = True
 single-interpreter = True
 limit-as = 1280
 reload-on-as = 1024
+buffer-size = {{ django_uwsgi_buffer_size|default(65535) }}
+post-buffering = {{ django_uwsgi_buffer_size|default(65535) }}
+listen = {{ django_uwsgi_listen|default(128) }}
+stats = /tmp/uwsgi.sock
+
+# Prevent uWSGI from IOError, SIGPIPE, etc.
+# https://stackoverflow.com/a/45393743/465623
+ignore-sigpipe
+ignore-write-errors
+disable-write-exception
+
 # set lazy-apps, see following refs:
 # http://uwsgi-docs.readthedocs.io/en/latest/articles/TheArtOfGracefulReloading.html#preforking-vs-lazy-apps-vs-lazy
 # https://stackoverflow.com/questions/22752521/uwsgi-flask-sqlalchemy-and-postgres-ssl-error-decryption-failed-or-bad-reco

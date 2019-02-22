@@ -7,4 +7,6 @@ autostart=true
 autorestart=true
 redirect_stderr=true
 stdout_logfile=/var/log/supervisor/{{ django_project_name }}-uwsgi.log
-stopsignal=INT
+stopsignal=HUP
+stopasgroup=true
+killasgroup=true
