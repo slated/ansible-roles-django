@@ -3,19 +3,15 @@
 
 - debug:
     var: django_webapp
-    verbosity: 1
 
 - debug:
     var: django_taskapp
-    verbosity: 1
     
 - debug:
     var: django_beatapp
-    verbosity: 1
 
 - debug:
     var: django_monitorapp
-    verbosity: 1
     
 - import_tasks: django_settings.yml
   tags: [always]

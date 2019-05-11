@@ -26,7 +26,6 @@
 - name: Repo changed?
   debug:
     var: repo_changed
-    verbosity: 1
 
 # get repo revision from the pulled code (use output of previous task)
 - name: Set repo_revision variable
@@ -99,3 +98,4 @@
   pip:
     virtualenv: '{{ django_project_path }}'
     requirements: '{{ django_path }}/requirements/production.txt'
+    extra_args: '--exists-action w'
