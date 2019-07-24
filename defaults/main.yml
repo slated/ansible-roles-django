@@ -108,6 +108,7 @@ celery_pool_implementation: prefork # prefork (default), eventlet, gevent or sol
 celery_application: '{{ django_application }}.taskapp.celery:app'
 celery_beat_scheduler: celery.beat.PersistentScheduler
 celery_time_limit: 300
+celery_max_tasks: 100
 flower_address: 127.0.0.1
 flower_port: 5555
 flower_url_prefix: __flower__

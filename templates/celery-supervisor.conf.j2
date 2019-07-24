@@ -1,9 +1,11 @@
 [program:{{ django_project_name }}_celery]
-command={{ django_project_path }}/bin/celery worker --app={{ celery_application }} --hostname=worker%(process_num)1d@%%h --loglevel=INFO -c {{ celery_concurrency }} -Q {{celery_queues|default('celery')}} --pool {{ celery_pool_implementation }} --time-limit={{ celery_time_limit }} --pidfile="{{ django_run_path }}/worker%(process_num)1d@%%h.pid" --logfile="{{ django_log_path }}/worker-%(process_num)1d-%%I@%%h.log --soft-time-limit={{ celery_soft_time_limit|default(celery_time_limit)}}"
+command={{ django_project_path }}/bin/celery worker --app={{ celery_application }} --hostname=worker%(process_num)1d@%%h --loglevel=INFO -c {{ celery_concurrency }} -Q {{celery_queues|default('celery')}} --pool {{ celery_pool_implementation }} --time-limit={{ celery_time_limit }} --pidfile="{{ django_run_path }}/worker%(process_num)1d@%%h.pid" --logfile="{{ django_log_path }}/worker-%(process_num)1d-%%I@%%h.log --soft-time-limit={{ celery_soft_time_limit|default(celery_time_limit)}}" --without-gossip --without-mingle -O fair --max-tasks-per-child {{ celery_max_tasks }}
 directory={{ django_path }}
 user={{ ansible_user }}
 autostart=true
 autorestart=false
+stopasgroup=true
+killasgroup=true
 redirect_stderr=true
 stdout_logfile=/var/log/supervisor/{{ django_project_name }}-celery.log
 numprocs={{ celery_numprocs }}
