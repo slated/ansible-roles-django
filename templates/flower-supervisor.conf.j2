@@ -10,4 +10,3 @@ redirect_stderr=true
 stdout_logfile=/var/log/supervisor/supervisor-flower.log
 {% set comma = joiner() %}
 environment={% for variable_name, value in django_environment.items()|sort %}{{ comma() }}{{ variable_name }}="{{ value|replace('%', '%%') }}"{% endfor %}
-

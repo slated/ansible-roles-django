@@ -28,7 +28,7 @@ disable-write-exception
 # set lazy-apps, see following refs:
 # http://uwsgi-docs.readthedocs.io/en/latest/articles/TheArtOfGracefulReloading.html#preforking-vs-lazy-apps-vs-lazy
 # https://stackoverflow.com/questions/22752521/uwsgi-flask-sqlalchemy-and-postgres-ssl-error-decryption-failed-or-bad-reco
-lazy-apps = true
+# lazy-apps = true
 {% for variable_name, value in django_settings.items()|sort %}
 env = {{ variable_name }}={{ value }}
 {% endfor %}

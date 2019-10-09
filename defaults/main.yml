@@ -97,7 +97,7 @@ django_base_apt_packages:
     # for wsgi, celery process management
     - supervisor
     # until migrated to a separate server
-    - redis-server
+    # - redis-server
 
 django_extra_apt_packages:
 
